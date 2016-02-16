@@ -1,5 +1,6 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Arhivators
 {
+    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
@@ -7,7 +8,7 @@
     using System.Globalization;
     using System.IO;
 
-    public class LogFileArhivator : BaseArhivator
+    public class LogFileArhivator : BaseArhivator, ILogFileArhivator
     {
         public const double DefaultMaxSize = 1.0;
         private string logFullPath;
@@ -18,20 +19,7 @@
             this.logFullPath = Path.Combine(rootPath, logFileSubPath);
         }
 
-        public static double GetMaxSize(string size)
-        {
-            double maxSize;
-            if (double.TryParse(size, out maxSize))
-            {
-                return maxSize;
-            }
-            else
-            {
-                return DefaultMaxSize;
-            }
-        }
-
-        public LogFileModel Compress(string logFileName, double maxSize, string arhivePath, string arhiveName)
+        public LogFileModel Compress(string logFileName, string maxSize, string arhivePath, string arhiveName)
         {
             var result = new LogFileModel()
             {
@@ -49,7 +37,7 @@
                 var logFileSize = logFile.Length / 1024.0 / 1024;
                 result.FileSize = logFileSize;
 
-                if (logFileSize > maxSize)
+                if (logFileSize > this.GetMaxSize(maxSize))
                 {
                     var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
                     var newFileName = string.Format("{0} {1}.txt", logFileName, currentDate);
@@ -67,6 +55,19 @@
             }
 
             return result;
+        }
+
+        private double GetMaxSize(string size)
+        {
+            double maxSize;
+            if (double.TryParse(size, out maxSize))
+            {
+                return maxSize;
+            }
+            else
+            {
+                return DefaultMaxSize;
+            }
         }
     }
 }

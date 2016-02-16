@@ -1,10 +1,11 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Arhivators
 {
+    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
     using System.IO;
 
-    public class RootArhivator : BaseArhivator 
+    public class RootArhivator : BaseArhivator, IRootArhivator 
     {
         private string rootPath;
 
@@ -14,13 +15,13 @@
             this.rootPath = rootPath;
         }
 
-        public ArhiveModel Compress(CheckpointModel checkpoint, string arhiveRoot, string arhiveName, string arhiveType)
+        public ArhiveModel Compress(CheckpointModel checkpoint, IArhiveSettings settings)
         {
             var result = new ArhiveModel()
             {
                 IsCompressed = false,
-                Path = arhiveRoot,
-                ArhivePatternName = string.Format("{0}*.{1}", arhiveName, arhiveType)
+                Path = settings.ArhivePath,
+                ArhivePatternName = string.Format("{0}*.{1}", settings.ArhiveName, settings.ArhiveType)
             };
 
             if (!checkpoint.IsCheckPointExist)
@@ -28,13 +29,13 @@
                 return result;
             }
 
-            if (!Directory.Exists(arhiveRoot))
+            if (!Directory.Exists(result.Path))
             {
-                Directory.CreateDirectory(arhiveRoot);
+                Directory.CreateDirectory(result.Path);
             }
 
-            var arhiveFullName = string.Format("{0} {1}", arhiveName, checkpoint.CheckpointName);
-            result.ArhiveFullPath = this.Arhivator.Arhive(this.rootPath, arhiveRoot, arhiveFullName, arhiveType);
+            var arhiveFullName = string.Format("{0} {1}", settings.ArhiveName, checkpoint.CheckpointName);
+            result.ArhiveFullPath = this.Arhivator.Arhive(this.rootPath, result.Path, arhiveFullName, settings.ArhiveType);
             result.IsCompressed = !string.IsNullOrWhiteSpace(result.ArhiveFullPath);
 
             if (result.IsCompressed)

@@ -1,19 +1,33 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Services
 {
+    using PerforceBackup.Engine.Interfaces;
     using System.IO;
 
-    public class DirectoryInformation
+    public class DirectoryInformation : IDirectoryInformation
     {
+        private const double ByteToMbRatio = 1024.0 * 1024;
+
         public double DirSizeInMb(string rootPath, string depotSubPath)
         {
-            return this.DirSize(rootPath, depotSubPath) / 1024.0 / 1024;
+            return this.DirSize(rootPath, depotSubPath) / ByteToMbRatio;
         }
+
+        public double DirSizeInMb(string fullPath)
+        {
+            return this.DirSize(fullPath) / ByteToMbRatio;
+        }
+
+        public long DirSize(string fullPath)
+        {
+            var directory = new DirectoryInfo(fullPath);
+            return DirSize(directory);
+        }
+
 
         public long DirSize(string rootPath, string depotSubPath)
         {
             var path = Path.Combine(rootPath, depotSubPath);
-            var directory = new DirectoryInfo(path);
-            return DirSize(directory);
+            return this.DirSize(path);
         }
 
         public long DirSize(DirectoryInfo directory)

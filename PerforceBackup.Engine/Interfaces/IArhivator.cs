@@ -1,6 +1,6 @@
 ﻿namespace PerforceBackup.Engine.Interfaces
 {
-    public interface IArhivator
+    public interface IArhivator : IService
     {
         string Arhive(string sourceName, string arhivePath, string arhiveName);
 

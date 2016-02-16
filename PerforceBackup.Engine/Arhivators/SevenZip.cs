@@ -1,7 +1,8 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Arhivators
 {
     using log4net;
     using PerforceBackup.Engine.Interfaces;
+    using PerforceBackup.Engine.Services;
     using System;
     using System.IO;
 

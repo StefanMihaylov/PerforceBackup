@@ -1,15 +1,17 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Arhivators
 {
+    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
+
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    public class CheckpointArhivator : BaseArhivator
+    public class CheckpointArhivator : BaseArhivator, ICheckpointArhivator
     {
         private string CheckpointFullPath;
 

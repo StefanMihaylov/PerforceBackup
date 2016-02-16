@@ -1,12 +1,14 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Services
 {
     using log4net;
+    using PerforceBackup.Engine.Base;
+    using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
     using System;
     using System.Diagnostics;
     using System.Text;
 
-    public class PerforceCommandLineExecutor : CommandExecutor
+    public class PerforceCommandLineExecutor : CommandExecutor, IPerforceCommandLineExecutor
     {
         public const string PerforceCommandClientName = "p4.exe";
 

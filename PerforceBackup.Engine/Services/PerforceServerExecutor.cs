@@ -1,12 +1,14 @@
-﻿namespace PerforceBackup.Engine
+﻿namespace PerforceBackup.Engine.Services
 {
-    using System;
-    using System.Linq;
+    using log4net;
+    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Models;
-using log4net;
+    using PerforceBackup.Engine.Interfaces;
+    using System;
+    using System.Linq;
 
-    public class PerforceServerExecutor : CommandExecutor
+    public class PerforceServerExecutor : CommandExecutor, IPerforceServerExecutor
     {
         public const string PerforceServerName = "p4d.exe";
         public const string SuccessWord = "Rotating";
@@ -44,13 +46,13 @@ using log4net;
 
             var lineAsArray = line.First().Split(new char[] { ' ', '/', '(', ')' }, StringSplitOptions.RemoveEmptyEntries);
 
-           var result = new ServerVersionModel()
-            {
-                Platform = lineAsArray[2],
-                Version = lineAsArray[3],
-                Revision = lineAsArray[4],
-                Date = new DateTime(int.Parse(lineAsArray[5]), int.Parse(lineAsArray[6]), int.Parse(lineAsArray[7]))
-            };
+            var result = new ServerVersionModel()
+             {
+                 Platform = lineAsArray[2],
+                 Version = lineAsArray[3],
+                 Revision = lineAsArray[4],
+                 Date = new DateTime(int.Parse(lineAsArray[5]), int.Parse(lineAsArray[6]), int.Parse(lineAsArray[7]))
+             };
 
             return result;
         }

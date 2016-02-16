@@ -1,16 +1,21 @@
 ﻿namespace PerforceBackup.Engine.Excel
 {
+    using PerforceBackup.Engine.Common;
+    using PerforceBackup.Engine.Interfaces;
+    using PerforceBackup.Engine.Models;
+
+    using Spire.Xls;
+
     using System;
     using System.Collections.Generic;
-    using System.Data.OleDb;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
 
-    using PerforceBackup.Engine.Common;
-    using PerforceBackup.Engine.Models;
-
-    public class ExcelWriter
+    public class ExcelWriter : IExcelWriter
     {
+        private const string SheetName = "Checkpoint_Log";
+
         private string root;
         private string fileName;
         private string extension;
@@ -38,92 +43,131 @@
             }
         }
 
-        public void AddRow(CheckPointLogModel logData)
+        public string PdfFullFileRoot
         {
-            //string excelConnectionString = @"Provider={0};Data Source=..\..\SalariesReport.xlsx; Extended Properties=""Excel 12.0 Xml;HDR=YES""";
-
-            var excelConnectionString = this.GetConnectionString();
-            using (var connection = new OleDbConnection(excelConnectionString))
+            get
             {
-                var columns = new List<Cell>();
-                columns.Add(new Cell("checkpoint", "№", "int", logData.Counters.Journal));
-                columns.Add(new Cell("date", "Дата", "nvarchar(30)", this.TruncateDate(logData.StartDate).ToString(StringConstrants.DateTimeFormat)));
-                columns.Add(new Cell("changelist", "Changelist", "int", logData.Counters.MaxCommitChange));
-                columns.Add(new Cell("upgrade", "Upgrade", "int", logData.Counters.Upgrade));
-                columns.Add(new Cell("users", "Потребители", "int", logData.Users));
-                columns.Add(new Cell("files", "Файлове", "int", logData.Sizes.FilesCount));
-                columns.Add(new Cell("revisions", "Версии", "int", logData.Sizes.RevisionsCount));
-                columns.Add(new Cell("depot", "Депо", "nvarchar(20)", string.Format("{0:0.00} Mb", logData.DepotSize)));
-                columns.Add(new Cell("log", "Log", "nvarchar(20)", string.Format("{0:0.00} Mb", logData.Log.FileSize)));
-                columns.Add(new Cell("auditlog", "Auditlog", "nvarchar(20)", string.Format("{0:0.00} Mb", logData.AuditLog.FileSize)));
-                columns.Add(new Cell("arhive", "Име", "nvarchar(30)", logData.Arhive != null ? logData.Arhive.ArhivePatternName : string.Empty));
-                columns.Add(new Cell("arhiveSize", "Размер", "nvarchar(20)", string.Format("{0:0.00} Mb", logData.Arhive != null ? logData.Arhive.Size : 0)));
-                columns.Add(new Cell("serverPlatform", "Платформа", "nvarchar(30)", logData.ServerInfo.Platform));
-                columns.Add(new Cell("serverVersion", "Версия", "nvarchar(30)", logData.ServerInfo.Version));
-                columns.Add(new Cell("serverRevision", "Ревизия", "int", logData.ServerInfo.Revision));
-                columns.Add(new Cell("serverDate", "от Дата", "nvarchar(20)", this.TruncateDate(logData.ServerInfo.Date).ToString(StringConstrants.DateFormat)));
-
-                connection.Open();
-
-                var sheetName = "Checkpoint_Log";// +"$";
-
-                var sheets = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, new Object[] { null, null, null, "TABLE" });
-                var isSheetExist = false;
-                for (int i = 0; i < sheets.Rows.Count; i++)
-                {
-                    var currentSheetName = sheets.Rows[i]["TABLE_NAME"].ToString();
-                    if (currentSheetName.Equals(sheetName))
-                    {
-                        isSheetExist = true;
-                    }
-                }
-
-                if (!isSheetExist)
-                {
-                    var columnSettings = string.Join(", ", columns.Select(r => r.ColumnSettings.ToString()));
-                    var createSheetQuery = string.Format("CREATE TABLE [{0}] ({1})", sheetName, columnSettings);
-                    OleDbCommand createSheet = new OleDbCommand(createSheetQuery, connection);
-                    createSheet.ExecuteNonQuery();
-                }
-
-                var columnDisplayNames = string.Join(", ", columns.Select(r => string.Format("[{0}]", r.ColumnSettings.ColumnDisplayName)));
-                var columnNames = string.Join(", ", columns.Select(r => r.ColumnSettings.ColumnName));
-                var inserQuery = string.Format("INSERT INTO [{0}] ({1}) VALUES ({2})", sheetName, columnDisplayNames, columnNames);
-                var insertLogData = new OleDbCommand(inserQuery, connection);
-                foreach (var item in columns)
-                {
-                    insertLogData.Parameters.AddWithValue(item.ColumnSettings.ColumnName, item.CellData);
-                }
-
-                insertLogData.ExecuteNonQuery();
+                return Path.Combine(this.root, this.PdfFullFileName);
             }
         }
 
-        private string GetConnectionString()
+        private string PdfFullFileName
         {
-            var properties = new Dictionary<string, string>();
-            properties.Add("Data Source", this.FullFileRoot);
-
-            var excelFile = new FileInfo(this.FullFileRoot);
-
-            switch (excelFile.Extension)
+            get
             {
-                case ".xlsx":
-                    // XLSX - Excel 2007, 2010, 2012, 2013
-                    properties.Add("Provider", "Microsoft.ACE.OLEDB.12.0");
-                    properties.Add("Extended Properties", "Excel 12.0 XML");
-                    break;
-                case ".xls":
-                    // XLS - Excel 2003 and Older
-                    properties.Add("Provider", "Microsoft.Jet.OLEDB.4.0");
-                    properties.Add("Extended Properties", "Excel 8.0");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("Only 'xlsx' and 'xls' file extensions are allowed! Not '" + excelFile.Extension + "'!");
+                return string.Format("{0}.pdf", fileName);
+            }
+        }
+        public void AddRow(CheckPointLogModel logData)
+        {
+            var columns = new List<KeyValuePair<string, object>>();
+
+            if (logData != null)
+            {
+                columns.Add(new KeyValuePair<string, object>("№", logData.Counters.Journal));
+                columns.Add(new KeyValuePair<string, object>("Дата", this.TruncateDate(logData.StartDate).ToString(StringConstrants.DateTimeFormat)));
+                columns.Add(new KeyValuePair<string, object>("Changelist", logData.Counters.MaxCommitChange));
+                columns.Add(new KeyValuePair<string, object>("Upgrade", logData.Counters.Upgrade));
+                columns.Add(new KeyValuePair<string, object>("Потребители", logData.Users));
+                columns.Add(new KeyValuePair<string, object>("Файлове", logData.Sizes.FilesCount));
+                columns.Add(new KeyValuePair<string, object>("Версии", logData.Sizes.RevisionsCount));
+                columns.Add(new KeyValuePair<string, object>("Депо", string.Format("{0:0.00} Mb", logData.DepotSize)));
+                columns.Add(new KeyValuePair<string, object>("Log", string.Format("{0:0.00} Mb", logData.Log.FileSize)));
+                columns.Add(new KeyValuePair<string, object>("Auditlog", string.Format("{0:0.00} Mb", logData.AuditLog.FileSize)));
+                columns.Add(new KeyValuePair<string, object>("Име", logData.Arhive != null ? logData.Arhive.ArhivePatternName : string.Empty));
+                columns.Add(new KeyValuePair<string, object>("Размер", string.Format("{0:0.00} Mb", logData.Arhive != null ? logData.Arhive.Size : 0)));
+                columns.Add(new KeyValuePair<string, object>("Платформа", logData.ServerInfo.Platform));
+                columns.Add(new KeyValuePair<string, object>("Версия", string.Format("'{0}", logData.ServerInfo.Version)));
+                columns.Add(new KeyValuePair<string, object>("Ревизия", logData.ServerInfo.Revision));
+                columns.Add(new KeyValuePair<string, object>("от Дата", this.TruncateDate(logData.ServerInfo.Date).ToString(StringConstrants.DateFormat)));
             }
 
-            var connectionString = string.Join(";", properties.Select(kv => string.Format("{0}={1}", kv.Key, kv.Value)));
-            return connectionString;
+            var workbook = new Workbook();
+            workbook.LoadFromFile(this.FullFileRoot);
+            Worksheet sheet = workbook.Worksheets.FirstOrDefault(s => s.Name == SheetName) as Worksheet;
+            if (sheet == null)
+            {
+                throw new ArgumentNullException("Excel sheet not found");
+            }
+
+            var range = sheet.Range;
+            var headerStart = this.FindHeader(range, "№");
+            var lastRow = this.FindLastRow(range, headerStart);
+            sheet.InsertRow(lastRow.Row, 1, InsertOptionsType.FormatAsBefore);
+
+            for (int index = 0; index < columns.Count; index++)
+            {
+                var currentCol = lastRow.Column + index;
+                var headerText = sheet.Range[headerStart.Row, currentCol].Text;
+                var currentCell = columns[index];
+                if (headerText == currentCell.Key)
+                {
+                    sheet.Range[lastRow.Row, currentCol].Value2 = currentCell.Value;
+                }
+            }
+
+            workbook.Save();
+            workbook.Dispose();
+        }
+
+        public void ConvertToPdf()
+        {
+            // load Excel file
+            var workbook = new Workbook();
+            workbook.LoadFromFile(this.FullFileRoot);
+
+            // Save PDF
+            if (File.Exists(this.PdfFullFileRoot))
+            {
+                File.Delete(this.PdfFullFileRoot);
+            }
+
+            workbook.SaveToFile(this.PdfFullFileRoot, FileFormat.PDF);
+        }
+
+        public void OpenExcel()
+        {
+            Process.Start(this.FullFileRoot);
+        }
+
+        public void OpenPdf()
+        {
+            Process.Start(this.PdfFullFileRoot);
+        }
+
+        private CellPosition FindHeader(CellRange range, string startValue)
+        {
+            var headerStart = new CellPosition(0, 0);
+            for (int row = range.Row; row <= range.LastRow; row++)
+            {
+                for (int col = range.Column; col <= range.LastColumn; col++)
+                {
+                    var currentCell = range[row, col].Value;
+                    if (currentCell == startValue)
+                    {
+                        headerStart = new CellPosition(row, col);
+                        break;
+                    }
+                }
+            }
+
+            return headerStart;
+        }
+
+        private CellPosition FindLastRow(CellRange range, CellPosition headerStart)
+        {
+            var result = headerStart;
+            for (int row = headerStart.Row; row <= range.LastRow + 1; row++)
+            {
+                var currentCell = range[row, headerStart.Column].Value;
+                if (string.IsNullOrWhiteSpace(currentCell))
+                {
+                    result.Row = row;
+                    break;
+                }
+            }
+
+            return result;
         }
 
         private DateTime TruncateDate(DateTime date)
