@@ -1,20 +1,24 @@
 ﻿namespace PerforceBackup.ConsoleApp
 {
     using log4net;
-
+    using PerforceBackup.ApiEngine;
     using PerforceBackup.Engine;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Logger;
     using PerforceBackup.Engine.Models;
-
-    using System;    
+    using System;
+    using System.Reflection;
 
     public class Program
     {
         public const string LogArhiveName = "Backup_logs";
         public const string CheckpointArhiveName = "Backup_ckp";
         public const string Log4NetPath = @"Logs\ResultLog.txt";
+
+        public const string uri = "localhost:1666";
+        public const string user = "Stefan.Mihaylov";
+        public const string ws_client = "Hadess_2528";
 
         private static ILog logger;
 
@@ -24,6 +28,20 @@
             {
                 logger = LogManager.GetLogger("PerforceBackup");
                 Logger.Setup(Log4NetPath);
+
+                var commands = new PerforceCommands(uri, user, ws_client);
+
+                commands.StartServer();
+              //  var verify = commands.Verify();
+
+                var counters = commands.GetCounters();
+                var userCount = commands.GetUsersCount();
+                var sizes = commands.GetSizes();
+                var serverInfo = commands.GetServerVersion();
+                var projectCount = commands.GetProjectCount();
+              //  var stop = commands.StopServer();
+
+                return;
 
                 var configurations = new Configurations();
                 IEngineManager engineManager = new EngineManager(logger, configurations);
@@ -40,7 +58,6 @@
                 Console.WriteLine(" - Start Server: {0}", cmd.StartService("Perforce", "successfully") ? "Done" : "NO"); // */
 
                 // validate
-
                 var executor = engineManager.PerforceCommandLineExecutor;
                 Console.WriteLine(" - Validate: {0}", executor.ValidateCommand() ? "OK" : "NO");
 
@@ -65,9 +82,9 @@
                 var checkpoint = checkpointBackup.Compress(configurations.LogArhivePath, CheckpointArhiveName);
                 Console.WriteLine("{0}", checkpoint.IsOldCheckpointsCompressed ? "Done" : "NO");
 
-                var rootBackup = engineManager.RootArhivator;
+                var rootArhivator = engineManager.RootArhivator;
                 Console.Write(" - Root Arhive: ");
-                checkpointLogInfo.Arhive = rootBackup.Compress(checkpoint, configurations);
+                checkpointLogInfo.Arhive = rootArhivator.Compress(checkpoint, configurations);
                 Console.WriteLine("{0}", checkpointLogInfo.Arhive);
 
                 // Start Server & end Backup; Statistics
@@ -93,7 +110,7 @@
                 var excelWriter = engineManager.ExcelWriter;
                 excelWriter.AddRow(checkpointLogInfo);
 
-                rootBackup.AddFileToArhiv(excelWriter.FullFileRoot, checkpointLogInfo.Arhive.ArhiveFullPath);
+                rootArhivator.AddFileToArhiv(excelWriter.FullFileRoot, checkpointLogInfo.Arhive.ArhiveFullPath);
 
                 logger.Info("Data saved to Excel");
 

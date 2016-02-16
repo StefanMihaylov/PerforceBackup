@@ -44,7 +44,7 @@
                     var renamedFileFullPath = Path.Combine(this.logFullPath, newFileName);
                     File.Move(logFileFullPath, renamedFileFullPath);
 
-                    var arhiveFullPath = this.Arhivator.Arhive(arhivePath, arhiveName, renamedFileFullPath);
+                    var arhiveFullPath = this.Arhivator.Arhive(renamedFileFullPath, arhivePath, arhiveName);
                     if (!string.IsNullOrWhiteSpace(arhiveFullPath))
                     {
                         result.IsCompress = true;
