@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerforceBackup.Engine", "PerforceBackup.Engine\PerforceBackup.Engine.csproj", "{4F150EF2-E9B7-4AB4-B802-7B8A4EF52FCA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerforceBackup.ConsoleApp", "PerforceBackup.ConsoleApp\PerforceBackup.ConsoleApp.csproj", "{DD374439-0DAB-4A13-995C-BA15A5C375E8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F150EF2-E9B7-4AB4-B802-7B8A4EF52FCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F150EF2-E9B7-4AB4-B802-7B8A4EF52FCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F150EF2-E9B7-4AB4-B802-7B8A4EF52FCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F150EF2-E9B7-4AB4-B802-7B8A4EF52FCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD374439-0DAB-4A13-995C-BA15A5C375E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD374439-0DAB-4A13-995C-BA15A5C375E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD374439-0DAB-4A13-995C-BA15A5C375E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD374439-0DAB-4A13-995C-BA15A5C375E8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
