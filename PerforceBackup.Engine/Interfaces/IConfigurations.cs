@@ -2,11 +2,15 @@
 {
     public interface IConfigurations
     {
-        string RootPath { get; }
-
-        string ServerSubPath { get; }
+        string ServerUrl { get; }
 
         string DepotSubPath { get; }
+
+
+
+        string RootPath { get; }
+
+        string ServerSubPath { get; }        
 
         string JournalSubPath { get; }
 
@@ -26,10 +30,9 @@
 
         string CheckpointLogExtension { get; }
 
-        // conmined paths 
-        string LogArhivePath { get; }
 
-        string DepotPath { get; }
+        // combined paths 
+        string LogArhivePath { get; }
 
         string BackupArhivePath { get; }
     }

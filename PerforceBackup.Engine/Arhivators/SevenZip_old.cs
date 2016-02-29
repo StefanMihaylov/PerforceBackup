@@ -6,14 +6,14 @@
     using System;
     using System.IO;
 
-    public class SevenZip : CommandPromptExecutor, IArhivator
+    public class SevenZip_old : CommandPromptExecutor, IArhivator
     {
         public const string DefaultArhiveType = "7z";
 
         private string sevenZipFullPath;
 
-        public SevenZip(ILog logger, string rootPath, string sevenZipSubPath)
-            : base(logger)
+        public SevenZip_old(ILog logger, IInfoLogger infoLogger, string rootPath, string sevenZipSubPath)
+            : base(logger, infoLogger)
         {
             this.sevenZipFullPath = Path.Combine(rootPath, sevenZipSubPath, "7z.exe");
         }

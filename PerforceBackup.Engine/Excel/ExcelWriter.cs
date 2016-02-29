@@ -68,8 +68,8 @@
                 columns.Add(new KeyValuePair<string, object>("Дата", this.TruncateDate(logData.StartDate).ToString(StringConstrants.DateTimeFormat)));
                 columns.Add(new KeyValuePair<string, object>("Changelist", logData.Counters.MaxCommitChange));
                 columns.Add(new KeyValuePair<string, object>("Upgrade", logData.Counters.Upgrade));
-                columns.Add(new KeyValuePair<string, object>("Потребители", logData.Users));
-                columns.Add(new KeyValuePair<string, object>("Проекти", 8));
+                columns.Add(new KeyValuePair<string, object>("Потребители", logData.UserCount));
+                columns.Add(new KeyValuePair<string, object>("Проекти", logData.ProjectCount));
                 columns.Add(new KeyValuePair<string, object>("Файлове", logData.Sizes.FilesCount));
                 columns.Add(new KeyValuePair<string, object>("Версии", logData.Sizes.RevisionsCount));
                 columns.Add(new KeyValuePair<string, object>("Депо", string.Format("{0:0.00} Mb", logData.DepotSize)));

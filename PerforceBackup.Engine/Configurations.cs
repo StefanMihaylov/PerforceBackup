@@ -37,20 +37,16 @@
 
         public string ArhiveType { get { return ConfigurationManager.AppSettings["ArhiveType"]; } }
 
-        // conmined paths
+        // API settings
+
+        public string ServerUrl { get { return ConfigurationManager.AppSettings["ServerUrl"]; } }
+
+        // combined paths
         public string LogArhivePath
         {
             get
             {
                 return Path.Combine(this.RootPath, this.BackupArhiveSubPath);
-            }
-        }
-
-        public string DepotPath
-        {
-            get
-            {
-                return Path.Combine(this.RootPath, this.DepotSubPath);
             }
         }
 

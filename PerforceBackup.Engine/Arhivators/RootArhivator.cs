@@ -4,19 +4,24 @@
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
     using System.IO;
+    using System;
+    using PerforceBackup.Engine.Common;
 
-    public class RootArhivator : BaseArhivator, IRootArhivator 
+    public class RootArhivator : BaseArhivator, IRootArhivator
     {
         private string rootPath;
+        private IInfoLogger logger;
 
-        public RootArhivator(IArhivator arhivator, string rootPath)
+        public RootArhivator(IArhivator arhivator, IInfoLogger logger, string rootPath)
             : base(arhivator)
         {
             this.rootPath = rootPath;
+            this.logger = logger;
         }
 
-        public ArhiveModel Compress(CheckpointModel checkpoint, IArhiveSettings settings)
+        public ArhiveModel Compress(string checkpointName, IArhiveSettings settings)
         {
+            this.logger.Write(" - Root Arhive: ");
             var result = new ArhiveModel()
             {
                 IsCompressed = false,
@@ -24,9 +29,9 @@
                 ArhivePatternName = string.Format("{0}*.{1}", settings.ArhiveName, settings.ArhiveType)
             };
 
-            if (!checkpoint.IsCheckPointExist)
+            if (string.IsNullOrWhiteSpace(checkpointName))
             {
-                return result;
+                checkpointName = DateTime.Now.ToString(StringConstrants.DateFormat);
             }
 
             if (!Directory.Exists(result.Path))
@@ -34,7 +39,7 @@
                 Directory.CreateDirectory(result.Path);
             }
 
-            var arhiveFullName = string.Format("{0} {1}", settings.ArhiveName, checkpoint.CheckpointName);
+            var arhiveFullName = string.Format("{0} {1}", settings.ArhiveName, checkpointName);
             result.ArhiveFullPath = this.Arhivator.Arhive(this.rootPath, result.Path, arhiveFullName, settings.ArhiveType);
             result.IsCompressed = !string.IsNullOrWhiteSpace(result.ArhiveFullPath);
 
@@ -45,6 +50,7 @@
                 result.Size = fileSize;
             }
 
+            this.logger.WriteLine("{0}", result);
             return result;
         }
 

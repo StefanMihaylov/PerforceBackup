@@ -14,20 +14,18 @@
     public class CheckpointArhivator : BaseArhivator, ICheckpointArhivator
     {
         private string CheckpointFullPath;
+        private IInfoLogger logger;
 
-        public CheckpointArhivator(IArhivator arhivator, string rootPath, string checkpointSubPath)
+        public CheckpointArhivator(IArhivator arhivator, IInfoLogger logger, string rootPath, string checkpointSubPath)
             : base(arhivator)
         {
             this.CheckpointFullPath = Path.Combine(rootPath, checkpointSubPath);
+            this.logger = logger;
         }
 
-        public CheckpointModel Compress(string arhivePath, string arhiveName)
+        public string Compress(string arhivePath, string arhiveName)
         {
-            var result = new CheckpointModel()
-            {
-                IsCheckPointExist = false,
-                IsOldCheckpointsCompressed = false
-            };
+            this.logger.Write(" - Checkpoints Arhive: ");
 
             var checkpointDir = new DirectoryInfo(this.CheckpointFullPath);
             var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
@@ -41,22 +39,20 @@
 
             if (todayCheckpoints.Count == 0)
             {
-                return result;
-            }
-            else
-            {
-                result.IsCheckPointExist = true;
-                result.CheckpointName = todayCheckpoints.Last();
-
+                this.logger.WriteLine(StringConstrants.FailMessage);
+                return null;
             }
 
-            var filesForArhive = this.GetFilesForArhive(checkpointDir, currentDate);
+            string currentCheckpointName = todayCheckpoints.Last();
+
+            IList<string> filesForArhive = this.GetFilesForArhive(checkpointDir, currentDate);
             if (filesForArhive.Count == 0)
             {
-                return result;
+                this.logger.WriteLine(StringConstrants.FailMessage);
+                return currentCheckpointName;
             }
 
-            foreach (var file in filesForArhive)
+            foreach (string file in filesForArhive)
             {
                 var arhiveFullPath = this.Arhivator.Arhive(file, arhivePath, arhiveName);
                 if (!string.IsNullOrWhiteSpace(arhiveFullPath))
@@ -66,12 +62,13 @@
                 }
                 else
                 {
-                    return result;
+                    this.logger.WriteLine(StringConstrants.FailMessage);
+                    return currentCheckpointName;
                 }
             }
 
-            result.IsOldCheckpointsCompressed = true;
-            return result;
+            this.logger.WriteLine(StringConstrants.SuccessMessage);
+            return currentCheckpointName;
         }
 
         private List<string> GetFilesForArhive(DirectoryInfo checkpointDir, string currentDate)
@@ -95,10 +92,10 @@
                                                      .Where(f => f.Name.Contains(date))
                                                      .Select(f => f.FullName));
             }
+
             return filesForArhive;
         }
 
-        // Note: This could very well be a bad implementation. I'm not too great with Regex.
         private int ExtractNumber(string text)
         {
             var match = Regex.Match(text, @"(\d+)");

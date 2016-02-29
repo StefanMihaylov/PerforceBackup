@@ -13,22 +13,35 @@
         public const string PerforceServerName = "p4d.exe";
         public const string SuccessWord = "Rotating";
 
-        public PerforceServerExecutor(ILog logger, string path, string exeSubpath)
+        public PerforceServerExecutor(ILog logger, IInfoLogger infoLogger, string path, string exeSubpath)
             : base(logger, path, exeSubpath, PerforceServerName)
         {
+            this.InfoLogger = infoLogger;
         }
+
+        protected IInfoLogger InfoLogger { get; private set; }
 
         public bool MakeCheckPoint(string checkpointSubPath)
         {
+            this.InfoLogger.Write(" - Checkpoint: ");
+
             var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
-            var checkpointLocation = string.IsNullOrWhiteSpace(checkpointSubPath) ? string.Empty : string.Format("{0}/", checkpointSubPath);
-            var result = this.ExecuteCommand(string.Format("-r {0} -J {1}journal -jc {1}{2}", this.ExePath, checkpointLocation, currentDate));
+            string checkpointLocation = string.Empty;
+            if (!string.IsNullOrWhiteSpace(checkpointSubPath))
+            {
+                checkpointLocation = string.Format("{0}/", checkpointSubPath);
+            }
+            string command = string.Format("-r {0} -J {1}journal -jc {1}{2}", this.ExePath, checkpointLocation, currentDate);
+
+            var result = this.ExecuteCommand(command);
             if (result != null && result.Contains(SuccessWord))
             {
+                this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
                 return true;
             }
             else
             {
+                this.InfoLogger.WriteLine(StringConstrants.ErrorMessage);
                 throw new InvalidOperationException(result);
             }
         }

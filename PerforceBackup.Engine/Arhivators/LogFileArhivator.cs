@@ -11,16 +11,21 @@
     public class LogFileArhivator : BaseArhivator, ILogFileArhivator
     {
         public const double DefaultMaxSize = 1.0;
-        private string logFullPath;
 
-        public LogFileArhivator(IArhivator arhivator, string rootPath, string logFileSubPath)
+        private string logFullPath;
+        private IInfoLogger logger;
+
+        public LogFileArhivator(IArhivator arhivator, IInfoLogger logger, string rootPath, string logFileSubPath)
             : base(arhivator)
         {
             this.logFullPath = Path.Combine(rootPath, logFileSubPath);
+            this.logger = logger;
         }
 
         public LogFileModel Compress(string logFileName, string maxSize, string arhivePath, string arhiveName)
         {
+            this.logger.Write(" - {0}{1}: ", char.ToUpper(logFileName[0]), logFileName.Substring(1));
+
             var result = new LogFileModel()
             {
                 LogFileName = logFileName,
@@ -54,6 +59,7 @@
                 }
             }
 
+            this.logger.WriteLine("{0}", result);
             return result;
         }
 

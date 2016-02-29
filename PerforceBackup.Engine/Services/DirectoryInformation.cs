@@ -7,44 +7,48 @@
     {
         private const double ByteToMbRatio = 1024.0 * 1024;
 
-        public double DirSizeInMb(string rootPath, string depotSubPath)
+        public double DirSizeInMb(string rootpath, string subPath, IInfoLogger logger = null)
         {
-            return this.DirSize(rootPath, depotSubPath) / ByteToMbRatio;
+            var path = Path.Combine(rootpath, subPath);
+            return this.DirSizeInMb(path, logger);
         }
 
-        public double DirSizeInMb(string fullPath)
+        public double DirSizeInMb(string path, IInfoLogger logger = null)
         {
-            return this.DirSize(fullPath) / ByteToMbRatio;
-        }
+            if (logger != null)
+            {
+                logger.Write(" - Depot Size: ");
+            }
 
-        public long DirSize(string fullPath)
-        {
-            var directory = new DirectoryInfo(fullPath);
-            return DirSize(directory);
-        }
+            DirectoryInfo directory = new DirectoryInfo(path);
+            double result = this.DirSize(directory) / ByteToMbRatio;
 
+            if (logger != null)
+            {
+                logger.WriteLine("{0:0.00}Mb", result);
+            }
 
-        public long DirSize(string rootPath, string depotSubPath)
-        {
-            var path = Path.Combine(rootPath, depotSubPath);
-            return this.DirSize(path);
+            return result;
         }
 
         public long DirSize(DirectoryInfo directory)
         {
             long totalSize = 0;
+
             // Add file sizes.
             FileInfo[] files = directory.GetFiles();
             foreach (FileInfo file in files)
             {
                 totalSize += file.Length;
             }
+
             // Add subdirectory sizes.
             DirectoryInfo[] directories = directory.GetDirectories();
             foreach (DirectoryInfo currentDirectory in directories)
             {
                 totalSize += DirSize(currentDirectory);
             }
+
             return totalSize;
         }
     }

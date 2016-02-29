@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerforceBackup.ConsoleApp",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerforceBackup.WpfApp", "PerforceBackup.WpfApp\PerforceBackup.WpfApp.csproj", "{A8D2A18E-9AED-43E6-B240-CBD7894825BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerforceBackup.ApiEngine", "PerforceBackup.ApiEngine\PerforceBackup.ApiEngine.csproj", "{78D5BFD0-0346-46FC-A0AE-B0792D96FB15}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FC2878B9-A500-4F00-A4B7-C7C2316CE684}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,10 +27,6 @@ Global
 		{A8D2A18E-9AED-43E6-B240-CBD7894825BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8D2A18E-9AED-43E6-B240-CBD7894825BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8D2A18E-9AED-43E6-B240-CBD7894825BC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78D5BFD0-0346-46FC-A0AE-B0792D96FB15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78D5BFD0-0346-46FC-A0AE-B0792D96FB15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78D5BFD0-0346-46FC-A0AE-B0792D96FB15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78D5BFD0-0346-46FC-A0AE-B0792D96FB15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

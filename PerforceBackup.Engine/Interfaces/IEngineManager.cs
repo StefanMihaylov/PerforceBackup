@@ -1,7 +1,17 @@
 ﻿namespace PerforceBackup.Engine.Interfaces
 {
+    using log4net;
+
     public interface IEngineManager
     {
+        ILog Logger { get; }
+
+        IInfoLogger InfoLogger { get; }
+
+        IConfigurations Configurations { get; }
+
+        IPerforceCommands PerforceCommands { get; }
+
         ICheckpointArhivator CheckpointArhivator { get; }
 
         ICommandPromptExecutor CommandPromptExecutor { get; }
