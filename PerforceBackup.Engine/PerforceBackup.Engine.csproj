@@ -41,10 +41,6 @@
       <HintPath>Libraries\p4api.net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SevenZipSharp, Version=0.64.3890.29348, Culture=neutral, PublicKeyToken=20de82c62b055c88, processorArchitecture=MSIL">
-      <HintPath>..\packages\SevenZipSharp.0.64\lib\SevenZipSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Spire.Common, Version=1.2.271.55040, Culture=neutral, PublicKeyToken=663f351905198cb3, processorArchitecture=MSIL">
       <HintPath>..\packages\FreeSpire.XLS.7.8\lib\net40\Spire.Common.dll</HintPath>
       <Private>True</Private>
@@ -74,13 +70,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Arhivators\SevenZipSharp.cs" />
+    <Compile Include="Arhivators\SevenZip.cs" />
     <Compile Include="Interfaces\IPerforceCommands.cs" />
     <Compile Include="ApiCommands\PerforceCommands.cs" />
     <Compile Include="ApiCommands\PerforceConnection.cs" />
     <Compile Include="Interfaces\IEngineManager.cs" />
     <Compile Include="Interfaces\IExcelWriter.cs" />
     <Compile Include="Interfaces\IInfoLogger.cs" />
+    <Compile Include="Interfaces\IResultLogger.cs" />
     <Compile Include="Interfaces\IRootArhivator.cs" />
     <Compile Include="Interfaces\ICheckpointArhivator.cs" />
     <Compile Include="Interfaces\ILogFileArhivator.cs" />
@@ -90,6 +87,8 @@
     <Compile Include="Interfaces\IConfigurations.cs" />
     <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Arhivators\CheckpointArhivator.cs" />
+    <Compile Include="Logger\EmptyResultLogger.cs" />
+    <Compile Include="Logger\ResultLogger.cs" />
     <Compile Include="Services\CommandExecutor.cs" />
     <Compile Include="BackupJob.cs" />
     <Compile Include="Interfaces\IJob.cs" />
@@ -104,7 +103,7 @@
     <Compile Include="Interfaces\IArhivator.cs" />
     <Compile Include="Interfaces\IPerforceServerExecutor.cs" />
     <Compile Include="Arhivators\LogFileArhivator.cs" />
-    <Compile Include="Logger\Logger.cs" />
+    <Compile Include="Logger\Log4netSettings.cs" />
     <Compile Include="Models\ArhiveModel.cs" />
     <Compile Include="Models\CheckPointLogModel.cs" />
     <Compile Include="Models\LogFileModel.cs" />
@@ -123,11 +122,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="7z.dll">
+    <Content Include="7z.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="p4api.net.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

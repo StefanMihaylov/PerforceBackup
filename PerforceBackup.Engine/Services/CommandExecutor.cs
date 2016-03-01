@@ -1,26 +1,27 @@
 ﻿namespace PerforceBackup.Engine.Services
-{   
+{
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Text;
 
-    using log4net;
+    using PerforceBackup.Engine.Interfaces;
 
     public abstract class CommandExecutor
     {
         private string perforcePath;
         private string exeSubpath;
         private string exeName;
-        private ILog logger;
 
-        protected CommandExecutor(ILog logger, string path, string exeSubpath, string exeName)
+        protected CommandExecutor(IResultLogger logger, string path, string exeSubpath, string exeName)
         {
-            this.logger = logger;
+            this.Logger = logger;
             this.PerforcePath = path;
             this.ExeSubpath = exeSubpath;
             this.ExeName = exeName;
         }
+
+        protected IResultLogger Logger { get; set; }
 
         protected string PerforcePath
         {
@@ -124,8 +125,8 @@
             {
                 var result = stdOutput.ToString().Trim();
 
-                var formatter = result.Length < 50 ? string.Empty: Environment.NewLine + "\t";
-                this.logger.Info(string.Format("{0} => {2}{1}", fullCommand, result, formatter));
+                var formatter = result.Length < 50 ? string.Empty : Environment.NewLine + "\t";
+                this.Logger.WriteInfoFormat("{0} => {2}{1}", fullCommand, result, formatter);
 
                 return result;
             }

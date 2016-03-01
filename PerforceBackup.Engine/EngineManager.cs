@@ -1,21 +1,20 @@
 ﻿namespace PerforceBackup.Engine
 {
-    using log4net;
+    using System;
+    using System.Collections.Generic;
 
+    using PerforceBackup.Engine.ApiCommands;
     using PerforceBackup.Engine.Arhivators;
     using PerforceBackup.Engine.Excel;
     using PerforceBackup.Engine.Interfaces;
+    using PerforceBackup.Engine.Logger;
     using PerforceBackup.Engine.Services;
-
-    using System;
-    using System.Collections.Generic;
-    using PerforceBackup.Engine.ApiCommands;
 
     public class EngineManager : IEngineManager
     {
         protected readonly IDictionary<Type, object> services;
 
-        public EngineManager(ILog logger, IInfoLogger infoLogger, IConfigurations configurations)
+        public EngineManager(IResultLogger logger, IInfoLogger infoLogger, IConfigurations configurations)
         {
             this.Logger = logger;
             this.InfoLogger = infoLogger;
@@ -24,7 +23,7 @@
             this.services = new Dictionary<Type, object>();
         }
 
-        public ILog Logger { get; private set; }
+        public IResultLogger Logger { get; private set; }
 
         public IInfoLogger InfoLogger { get; private set; }
 
@@ -50,7 +49,7 @@
         {
             get
             {
-                return (IArhivator)this.GetRepository<SevenZipSharp>();
+                return (IArhivator)this.GetRepository<SevenZip>();
             }
         }
 
@@ -107,12 +106,13 @@
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(PerforceServerExecutor)))
                 {
-                    var parameters = new object[] { this.Logger, this.InfoLogger, this.PerforceCommands.ServerRoot, string.Empty };
+                    var parameters = new object[] { new EmptyResultLogger(), this.InfoLogger, this.PerforceCommands.ServerRoot, string.Empty };
                     instance = Activator.CreateInstance(typeof(PerforceServerExecutor), parameters);
                 }
-                else if (typeof(T).IsAssignableFrom(typeof(SevenZipSharp)))
+                else if (typeof(T).IsAssignableFrom(typeof(SevenZip)))
                 {
-                    instance = Activator.CreateInstance(typeof(SevenZipSharp));
+                    var parameters = new object[] { new EmptyResultLogger()}; // this.Logger
+                    instance = Activator.CreateInstance(typeof(SevenZip), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(LogFileArhivator)))
                 {

@@ -1,10 +1,8 @@
 ﻿namespace PerforceBackup.Engine.Interfaces
 {
-    using log4net;
-
     public interface IEngineManager
     {
-        ILog Logger { get; }
+        IResultLogger Logger { get; }
 
         IInfoLogger InfoLogger { get; }
 

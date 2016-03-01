@@ -8,8 +8,8 @@
     <add key="LogArhiveSubPath" value="..\Checkpoint\Backup_logs.7z" />
     <add key="CheckpointArhiveSubPath" value="..\Checkpoint\Backup_ckp.7z" />
     <add key="CheckpointLogPath" value="..\Checkpoint\Checkpoint_Log.xls" />
-    <add key="MaxLogSize" value="0" />
-    <add key="MaxAuditLogSize" value="0" />
+    <add key="MaxLogSize" value="4" />
+    <add key="MaxAuditLogSize" value="4" />
     <add key="RootArhiveSubPath" value="..\" />
     <add key="ArhivePath" value="D:\Arhiv\VivacomDotNet" />
   </appSettings>

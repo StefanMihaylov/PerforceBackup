@@ -6,7 +6,7 @@
     using log4net.Layout;
     using log4net.Repository.Hierarchy;
 
-    public class Logger
+    public class Log4netSettings
     {
         public static void Setup(string path)
         {

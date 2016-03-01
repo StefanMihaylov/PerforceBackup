@@ -1,19 +1,18 @@
 ﻿namespace PerforceBackup.Engine.Services
 {
-    using log4net;
-    using PerforceBackup.Engine.Common;
-    using PerforceBackup.Engine.Models;
-    using PerforceBackup.Engine.Interfaces;
     using System;
     using System.Linq;
-    using System.ServiceProcess;
+
+    using PerforceBackup.Engine.Common;
+    using PerforceBackup.Engine.Interfaces;
+    using PerforceBackup.Engine.Models;
 
     public class PerforceServerExecutor : CommandExecutor, IPerforceServerExecutor
     {
         public const string PerforceServerName = "p4d.exe";
         public const string SuccessWord = "Rotating";
 
-        public PerforceServerExecutor(ILog logger, IInfoLogger infoLogger, string path, string exeSubpath)
+        public PerforceServerExecutor(IResultLogger logger, IInfoLogger infoLogger, string path, string exeSubpath)
             : base(logger, path, exeSubpath, PerforceServerName)
         {
             this.InfoLogger = infoLogger;
@@ -68,36 +67,6 @@
              };
 
             return result;
-        }
-
-        public bool StartService(string serviceName = "Perforce")
-        {
-            this.InfoLogger.Write(" - Start Server: ");
-
-            var serviceController = new ServiceController(serviceName);
-            if (serviceController.Status == ServiceControllerStatus.Stopped)
-            {
-                serviceController.Start();
-                serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10.0));
-            }
-
-            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
-            return true;
-        }
-
-        public bool StopService(string serviceName = "Perforce")
-        {
-            this.InfoLogger.Write(" - Stop Server: ");
-
-            var serviceController = new ServiceController(serviceName);
-            if (serviceController.Status == ServiceControllerStatus.Running)
-            {
-                serviceController.Stop();
-                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10.0));
-            }
-
-            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
-            return true;
         }
     }
 }

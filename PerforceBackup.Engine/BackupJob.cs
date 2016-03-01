@@ -1,15 +1,11 @@
 ﻿namespace PerforceBackup.Engine
 {
     using System;
-    using System.IO;
-    using System.Threading;
-    using log4net;
-    using PerforceBackup.Engine.ApiCommands;
-    using PerforceBackup.Engine.Arhivators;
+    using System.ServiceProcess;
+
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
-    using PerforceBackup.Engine.Services;
 
     public class BackupJob : IJob
     {
@@ -21,7 +17,7 @@
             this.version = version;
         }
 
-        public BackupJob(ILog logger, IInfoLogger infoLogger, IConfigurations configurations, string version = null)
+        public BackupJob(IResultLogger logger, IInfoLogger infoLogger, IConfigurations configurations, string version = null)
             : this(new EngineManager(logger, infoLogger, configurations))
         {
             this.version = version;
@@ -29,7 +25,7 @@
 
         protected IEngineManager EngineManager { get; private set; }
 
-        protected ILog Logger
+        protected IResultLogger Logger
         {
             get
             {
@@ -82,7 +78,7 @@
 
             IRootArhivator rootArhivator = this.EngineManager.RootArhivator;
             rootArhivator.AddFileToArhiv(excelWriter.FullFileRoot, result.Arhive.ArhiveFullPath);
-            this.Logger.Info("Data saved to Excel");
+            this.Logger.WriteInfo("Data saved to Excel");
         }
 
         public void MakeCheckpoint(CheckPointLogModel result)
@@ -111,7 +107,7 @@
                 version = string.Format("v.{0}", this.version);
             }
 
-            this.Logger.InfoFormat("PerforceBackup {0} started...", version);
+            this.Logger.WriteInfoFormat("PerforceBackup {0} started...", version);
             this.InfoLogger.WriteLine(" - Date: {0}", result.StartDate.ToString(StringConstrants.DateTimeFormat));
 
             this.StartService();
@@ -119,7 +115,7 @@
 
         public void EndMessage()
         {
-            this.Logger.Info("End" + Environment.NewLine);
+            this.Logger.WriteInfo("End" + Environment.NewLine);
             this.InfoLogger.WriteLine(" - End");
         }
 
@@ -143,16 +139,32 @@
             result.DepotSize = dirInfo.DirSizeInMb(perforce.ServerRoot, this.Configurations.DepotSubPath, this.InfoLogger);
         }
 
-        public void StopService()
+        public void StopService(string serviceName = "Perforce")
         {
-            IPerforceServerExecutor server = this.EngineManager.PerforceServerExecutor;
-            server.StopService();
+            this.InfoLogger.Write(" - Stop Server: ");
+
+            var serviceController = new ServiceController(serviceName);
+            if (serviceController.Status == ServiceControllerStatus.Running)
+            {
+                serviceController.Stop();
+                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10.0));
+            }
+
+            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
         }
 
-        public void StartService()
+        public void StartService(string serviceName = "Perforce")
         {
-            IPerforceServerExecutor server = this.EngineManager.PerforceServerExecutor;
-            server.StartService();
+            this.InfoLogger.Write(" - Start Server: ");
+
+            var serviceController = new ServiceController(serviceName);
+            if (serviceController.Status == ServiceControllerStatus.Stopped)
+            {
+                serviceController.Start();
+                serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10.0));
+            }
+
+            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);            
         }
     }
 }
