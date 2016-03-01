@@ -101,7 +101,7 @@
 
                 if (typeof(T).IsAssignableFrom(typeof(PerforceCommands)))
                 {
-                    var parameters = new object[] { this.Configurations.ServerUrl, this.InfoLogger };
+                    var parameters = new object[] { this.Configurations.ServerUrl, this.Configurations.ServerUser, this.Configurations.UserWorkSpace, this.InfoLogger };
                     instance = Activator.CreateInstance(typeof(PerforceCommands), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(PerforceServerExecutor)))

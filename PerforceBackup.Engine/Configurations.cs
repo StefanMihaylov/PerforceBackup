@@ -21,6 +21,11 @@
 
         public string ServerUrl { get { return this.settings["ServerUrl"].Value; } }
 
+        public string ServerUser { get { return this.settings["ServerUser"].Value; } }
+
+        public string UserWorkSpace { get { return this.settings["UserWorkSpace"].Value; } }
+
+
         public string DepotSubPath { get { return this.settings["DepotSubPath"].Value; } }
 
         public string BackupSubPath { get { return this.settings["BackupSubPath"].Value; } }

@@ -1,7 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration>
   <appSettings>
-    <add key="ServerUrl" value="localhost:1666"/>    
+    <add key="ServerUrl" value="localhost:1666"/>
+    <add key="ServerUser" value="Stefan.Mihaylov"/>
+    <add key="UserWorkSpace" value="Stefan.Mihaylov_home"/>
+    
     <add key="DepotSubPath" value=".\Depot" />
     <add key="BackupSubPath" value=".\Backup" />
     <add key="CheckpointSubPath" value="Backup" />

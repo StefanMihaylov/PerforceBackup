@@ -4,6 +4,11 @@
     {
         string ServerUrl { get; }
 
+        string ServerUser { get; }
+
+        string UserWorkSpace { get; }
+
+
         string DepotSubPath { get; }
 
         string BackupSubPath { get; }

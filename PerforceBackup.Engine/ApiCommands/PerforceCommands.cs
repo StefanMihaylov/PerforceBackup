@@ -11,8 +11,8 @@
 
     public class PerforceCommands : PerforceConnection, IPerforceCommands
     {
-        public PerforceCommands(string uri, IInfoLogger logger)
-            : base(uri)
+        public PerforceCommands(string uri, string user, string ws_client, IInfoLogger logger)
+            : base(uri, user, ws_client)
         {
             this.InfoLogger = logger;
         }
