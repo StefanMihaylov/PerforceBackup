@@ -23,25 +23,14 @@
 
             string arhiveFullPath = Path.GetFullPath(Path.Combine(this.RootPath, arhivePath));
 
-            var checkpointDir = new DirectoryInfo(this.CombinedPath);
-            var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
-            var todayCheckpointFilter = string.Format("{0}.ckp.", currentDate);
-
-            var todayCheckpoints = checkpointDir.GetFiles()
-                                                .Where(f => f.Name.Contains(todayCheckpointFilter) && !f.Name.Contains(".md5"))
-                                                .Select(f => f.Name)
-                                                .OrderBy(f => f, new AlphanumComparator())
-                                                .ToList();
-
-            if (todayCheckpoints.Count == 0)
+            string currentCheckpointName = this.GetLastCheckpointName();
+            if (string.IsNullOrWhiteSpace(currentCheckpointName))
             {
                 this.Logger.WriteLine(StringConstrants.FailMessage);
                 return null;
             }
 
-            string currentCheckpointName = todayCheckpoints.Last();
-
-            IList<string> filesForArhive = this.GetFilesForArhive(checkpointDir, currentDate);
+            IList<string> filesForArhive = this.GetFilesForArhive(currentCheckpointName);
             if (filesForArhive.Count == 0)
             {
                 this.Logger.WriteLine(StringConstrants.FailMessage);
@@ -60,28 +49,44 @@
             return currentCheckpointName;
         }
 
-        private List<string> GetFilesForArhive(DirectoryInfo checkpointDir, string currentDate)
+        private string GetLastCheckpointName()
         {
-            var oldCheckPoint = checkpointDir.GetFiles()
-                                           .Where(f => f.Name.Contains(".ckp.") && !f.Name.Contains(currentDate))
-                                           .Select(f => f.Name)
-                                           .ToList();
+            DirectoryInfo checkpointDir = new DirectoryInfo(this.CombinedPath);
 
-            var oldCheckpointsDate = new HashSet<string>();
-            foreach (var name in oldCheckPoint)
+            var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
+            var todayCheckpointFilter = string.Format("{0}.ckp.", currentDate);
+
+            List<string> todayCheckpoints = checkpointDir.GetFiles()
+                                .Where(f => f.Name.Contains(todayCheckpointFilter) && !f.Name.Contains(".md5"))
+                                .Select(f => f.Name)
+                                .OrderBy(f => f, new AlphanumComparator())
+                                .ToList();
+
+            if (todayCheckpoints.Count == 0)
             {
-                var nameSubParts = name.Split(new string[] { ".ckp." }, StringSplitOptions.RemoveEmptyEntries);
-                oldCheckpointsDate.Add(nameSubParts[0]);
+                return null;
             }
 
-            var filesForArhive = new List<string>();
-            foreach (var date in oldCheckpointsDate)
-            {
-                filesForArhive.AddRange(checkpointDir.GetFiles()
-                                                     .Where(f => f.Name.Contains(date))
-                                                     .Select(f => f.FullName));
-            }
+            return todayCheckpoints.Last();
+        }
 
+        private IList<string> GetFilesForArhive(string currentCheckpointName)
+        {
+            DirectoryInfo checkpointDir = new DirectoryInfo(this.CombinedPath);
+
+            var nameSubParts = currentCheckpointName.Split(new string[] { ".ckp." }, StringSplitOptions.RemoveEmptyEntries);
+            var checkpointNumber = int.Parse(nameSubParts[1]);
+
+            var lastCheckpointFiles = new HashSet<string>();
+            lastCheckpointFiles.Add(currentCheckpointName);
+            lastCheckpointFiles.Add(string.Format("{0}.md5", currentCheckpointName));
+            lastCheckpointFiles.Add(string.Format("{0}.jnl.{1}", nameSubParts[0], checkpointNumber - 1));
+
+            IList<string> filesForArhive = checkpointDir.GetFiles()
+                                                     .Where(f => f.Name.Contains(".ckp.") || f.Name.Contains(".jnl."))
+                                                     .Where(f => !lastCheckpointFiles.Contains(f.Name))
+                                                     .Select(f => f.FullName)
+                                                     .ToList();
             return filesForArhive;
         }
 

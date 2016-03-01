@@ -106,7 +106,7 @@
         {
             this.InfoLogger.WriteLine(" - Start...");
             string version = string.Empty;
-            if (string.IsNullOrWhiteSpace(this.version))
+            if (!string.IsNullOrWhiteSpace(this.version))
             {
                 version = string.Format("v.{0}", this.version);
             }
