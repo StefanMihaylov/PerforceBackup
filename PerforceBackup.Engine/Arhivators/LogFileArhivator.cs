@@ -1,6 +1,5 @@
 ﻿namespace PerforceBackup.Engine.Arhivators
 {
-    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
@@ -12,19 +11,14 @@
     {
         public const double DefaultMaxSize = 1.0;
 
-        private string logFullPath;
-        private IInfoLogger logger;
-
         public LogFileArhivator(IArhivator arhivator, IInfoLogger logger, string rootPath, string logFileSubPath)
-            : base(arhivator)
+            : base(arhivator, logger, rootPath, logFileSubPath)
         {
-            this.logFullPath = Path.Combine(rootPath, logFileSubPath);
-            this.logger = logger;
         }
 
-        public LogFileModel Compress(string logFileName, string maxSize, string arhivePath, string arhiveName)
+        public LogFileModel Compress(string logFileName, string maxSize, string arhivePath)
         {
-            this.logger.Write(" - {0}{1}: ", char.ToUpper(logFileName[0]), logFileName.Substring(1));
+            this.Logger.Write(" - {0}{1}: ", char.ToUpper(logFileName[0]), logFileName.Substring(1));
 
             var result = new LogFileModel()
             {
@@ -32,34 +26,32 @@
                 IsCompress = false
             };
 
-            var logFileFullPath = Path.Combine(this.logFullPath, logFileName);
-            var isExist = File.Exists(logFileFullPath);
-            result.IsExist = isExist;
+            var logFileFullPath = Path.Combine(this.CombinedPath, logFileName);
+            var arhiveFullPath = Path.GetFullPath(Path.Combine(this.RootPath, arhivePath));
 
-            if (isExist)
+            result.IsExist = File.Exists(logFileFullPath);
+            if (result.IsExist)
             {
                 var logFile = new FileInfo(logFileFullPath);
                 var logFileSize = logFile.Length / 1024.0 / 1024;
                 result.FileSize = logFileSize;
 
-                if (logFileSize > this.GetMaxSize(maxSize))
+                if (logFileSize >= this.GetMaxSize(maxSize))
                 {
                     var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
                     var newFileName = string.Format("{0} {1}.txt", logFileName, currentDate);
-                    var renamedFileFullPath = Path.Combine(this.logFullPath, newFileName);
+                    var renamedFileFullPath = Path.Combine(this.CombinedPath, newFileName);
                     File.Move(logFileFullPath, renamedFileFullPath);
 
-                    var arhiveFullPath = this.Arhivator.Arhive(renamedFileFullPath, arhivePath, arhiveName);
-                    if (!string.IsNullOrWhiteSpace(arhiveFullPath))
-                    {
-                        result.IsCompress = true;
-                        File.SetAttributes(renamedFileFullPath, FileAttributes.Normal);
-                        File.Delete(renamedFileFullPath);
-                    }
+                    this.Arhivator.Arhive(renamedFileFullPath, arhiveFullPath);
+
+                    result.IsCompress = true;
+                    File.SetAttributes(renamedFileFullPath, FileAttributes.Normal);
+                    File.Delete(renamedFileFullPath);
                 }
             }
 
-            this.logger.WriteLine("{0}", result);
+            this.Logger.WriteLine("{0}", result);
             return result;
         }
 

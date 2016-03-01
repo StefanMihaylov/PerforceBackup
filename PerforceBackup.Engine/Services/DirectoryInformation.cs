@@ -9,7 +9,7 @@
 
         public double DirSizeInMb(string rootpath, string subPath, IInfoLogger logger = null)
         {
-            var path = Path.Combine(rootpath, subPath);
+            var path = Path.GetFullPath(Path.Combine(rootpath, subPath));
             return this.DirSizeInMb(path, logger);
         }
 

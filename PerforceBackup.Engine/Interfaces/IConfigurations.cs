@@ -6,34 +6,22 @@
 
         string DepotSubPath { get; }
 
-
-
-        string RootPath { get; }
-
-        string ServerSubPath { get; }        
-
-        string JournalSubPath { get; }
+        string BackupSubPath { get; }
 
         string CheckpointSubPath { get; }
 
-        string BackupArhiveSubPath { get; }
+        string LogArhiveSubPath { get; }
 
-        string SevenZipSubPath { get; }
+        string CheckpointArhiveSubPath { get; }
 
-        string LogFilesSubPath { get; }
+        string CheckpointLogPath { get; }
 
         string MaxLogSize { get; }
 
-        string MaxAuditLogSize { get; }                
+        string MaxAuditLogSize { get; }
 
-        string CheckpointLogName { get; }
+        string RootArhiveSubPath { get; }
 
-        string CheckpointLogExtension { get; }
-
-
-        // combined paths 
-        string LogArhivePath { get; }
-
-        string BackupArhivePath { get; }
+        string ArhivePath { get; }
     }
 }

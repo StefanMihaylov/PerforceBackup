@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="ServerUrl" value="localhost:1666"/>    
+    <add key="DepotSubPath" value=".\Depot" />
+    <add key="BackupSubPath" value=".\Backup" />
+    <add key="CheckpointSubPath" value="Backup" />
+    <add key="LogArhiveSubPath" value="..\Checkpoint\Backup_logs.7z" />
+    <add key="CheckpointArhiveSubPath" value="..\Checkpoint\Backup_ckp.7z" />
+    <add key="CheckpointLogPath" value="..\Checkpoint\Checkpoint_Log.xls" />
+    <add key="MaxLogSize" value="0" />
+    <add key="MaxAuditLogSize" value="0" />
+    <add key="RootArhiveSubPath" value="..\" />
+    <add key="ArhivePath" value="D:\Arhiv\VivacomDotNet" />
+  </appSettings>
+</configuration>

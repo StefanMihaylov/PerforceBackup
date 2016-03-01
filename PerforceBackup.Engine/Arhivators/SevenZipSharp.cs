@@ -25,18 +25,18 @@
             this.compressor.CompressionLevel = CompressionLevel.Normal;
         }
 
-        public string Arhive(string sourceName, string arhivePath, string arhiveName)
+        public void Arhive(string sourceName, string arhivePath, string arhiveName)
         {
-            return this.Arhive(sourceName, arhivePath, arhiveName, DefaultArhiveType);
+            this.Arhive(sourceName, arhivePath, arhiveName, DefaultArhiveType);
         }
 
-        public string Arhive(string sourceName, string arhivePath, string arhiveName, string arhiveType)
+        public void Arhive(string sourceName, string arhivePath, string arhiveName, string arhiveType)
         {
-            var arhiveFullPath = Path.Combine(arhivePath, string.Format("{0}.{1}", arhiveName, arhiveType));
-            return Arhive(sourceName, arhiveFullPath);
+            var arhiveFullPath = Path.GetFullPath(Path.Combine(arhivePath, string.Format("{0}.{1}", arhiveName, arhiveType)));
+            this.Arhive(sourceName, arhiveFullPath);
         }
 
-        public string Arhive(string sourceName, string arhiveFullPath)
+        public void Arhive(string sourceName, string arhiveFullPath)
         {
             if (File.Exists(arhiveFullPath))
             {
@@ -50,14 +50,13 @@
             FileAttributes attr = File.GetAttributes(sourceName);
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
-                this.compressor.CompressDirectory(sourceName, arhiveFullPath, true);
+
+                this.compressor.CompressDirectory(sourceName, arhiveFullPath);
             }
             else
             {
                 this.compressor.CompressFiles(arhiveFullPath, sourceName);
             }
-
-            return arhiveFullPath;
         }
     }
 }

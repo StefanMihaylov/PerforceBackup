@@ -1,6 +1,5 @@
 ﻿namespace PerforceBackup.Engine.Arhivators
 {
-    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
     using PerforceBackup.Engine.Models;
@@ -13,21 +12,18 @@
 
     public class CheckpointArhivator : BaseArhivator, ICheckpointArhivator
     {
-        private string CheckpointFullPath;
-        private IInfoLogger logger;
-
         public CheckpointArhivator(IArhivator arhivator, IInfoLogger logger, string rootPath, string checkpointSubPath)
-            : base(arhivator)
+            : base(arhivator, logger, rootPath, checkpointSubPath)
         {
-            this.CheckpointFullPath = Path.Combine(rootPath, checkpointSubPath);
-            this.logger = logger;
         }
 
-        public string Compress(string arhivePath, string arhiveName)
+        public string Compress(string arhivePath)
         {
-            this.logger.Write(" - Checkpoints Arhive: ");
+            this.Logger.Write(" - Checkpoints Arhive: ");
 
-            var checkpointDir = new DirectoryInfo(this.CheckpointFullPath);
+            string arhiveFullPath = Path.GetFullPath(Path.Combine(this.RootPath, arhivePath));
+
+            var checkpointDir = new DirectoryInfo(this.CombinedPath);
             var currentDate = DateTime.Now.ToString(StringConstrants.DateFormat);
             var todayCheckpointFilter = string.Format("{0}.ckp.", currentDate);
 
@@ -39,7 +35,7 @@
 
             if (todayCheckpoints.Count == 0)
             {
-                this.logger.WriteLine(StringConstrants.FailMessage);
+                this.Logger.WriteLine(StringConstrants.FailMessage);
                 return null;
             }
 
@@ -48,26 +44,19 @@
             IList<string> filesForArhive = this.GetFilesForArhive(checkpointDir, currentDate);
             if (filesForArhive.Count == 0)
             {
-                this.logger.WriteLine(StringConstrants.FailMessage);
+                this.Logger.WriteLine(StringConstrants.FailMessage);
                 return currentCheckpointName;
             }
 
             foreach (string file in filesForArhive)
             {
-                var arhiveFullPath = this.Arhivator.Arhive(file, arhivePath, arhiveName);
-                if (!string.IsNullOrWhiteSpace(arhiveFullPath))
-                {
-                    File.SetAttributes(file, FileAttributes.Normal);
-                    File.Delete(file);
-                }
-                else
-                {
-                    this.logger.WriteLine(StringConstrants.FailMessage);
-                    return currentCheckpointName;
-                }
+                this.Arhivator.Arhive(file, arhiveFullPath);
+
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
             }
 
-            this.logger.WriteLine(StringConstrants.SuccessMessage);
+            this.Logger.WriteLine(StringConstrants.SuccessMessage);
             return currentCheckpointName;
         }
 

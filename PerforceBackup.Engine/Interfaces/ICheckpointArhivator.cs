@@ -2,6 +2,6 @@
 {
     public interface ICheckpointArhivator : IService
     {
-        string Compress(string arhivePath, string arhiveName);
+        string Compress(string arhivePath);
     }
 }

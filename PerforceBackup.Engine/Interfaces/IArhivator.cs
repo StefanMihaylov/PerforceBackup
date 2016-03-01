@@ -2,10 +2,10 @@
 {
     public interface IArhivator : IService
     {
-        string Arhive(string sourceName, string arhivePath, string arhiveName);
+        //void Arhive(string sourceName, string arhivePath, string arhiveName);
 
-        string Arhive(string sourceName, string arhivePath, string arhiveName, string arhiveType);
+        //void Arhive(string sourceName, string arhivePath, string arhiveName, string arhiveType);
 
-        string Arhive(string sourceName, string arhiveFullPath);
+        void Arhive(string sourceName, string arhiveFullPath);
     }
 }

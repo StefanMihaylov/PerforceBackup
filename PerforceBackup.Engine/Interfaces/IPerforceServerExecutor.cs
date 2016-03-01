@@ -7,5 +7,9 @@
         ServerVersionModel GetServerVersion();
 
         bool MakeCheckPoint(string checkpointSubPath);
+
+        bool StartService(string serviceName = "Perforce");
+
+        bool StopService(string serviceName = "Perforce");
     }
 }

@@ -6,6 +6,6 @@
     {
         void AddFileToArhiv(string sourceFullPath, string arhiveFullPath);
 
-        ArhiveModel Compress(string checkpoint, IArhiveSettings settings);
+        ArhiveModel Compress(string checkpoint, string arhivePath);
     }
 }

@@ -4,6 +4,8 @@
 
     public interface IPerforceCommands : IService
     {
+        string ServerRoot { get; }
+
         CountersModel GetCounters();
 
         int GetProjectCount();
@@ -17,7 +19,5 @@
         bool StopServer();
 
         bool Verify();
-
-        string GetServerRoot();
     }
 }

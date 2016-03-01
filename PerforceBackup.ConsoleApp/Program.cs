@@ -6,7 +6,6 @@
     using PerforceBackup.Engine.ApiCommands;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Interfaces;
-    using PerforceBackup.Engine.Jobs;
     using PerforceBackup.Engine.Logger;
     using PerforceBackup.Engine.Models;
 
@@ -25,7 +24,7 @@
                 IConfigurations configurations = new Configurations();
                 IInfoLogger infoLogger = new ConsoleLogger();
 
-                IJob job = new BackupJob(logger, infoLogger, configurations);
+                IJob job = new BackupJob(logger, infoLogger, configurations, Numerics.Version);
                 job.Execute();
             }
             catch (Exception ex)

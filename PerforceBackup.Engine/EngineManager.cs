@@ -38,22 +38,6 @@
             }
         }
 
-        public ICommandPromptExecutor CommandPromptExecutor
-        {
-            get
-            {
-                return (ICommandPromptExecutor)this.GetRepository<CommandPromptExecutor>();
-            }
-        }
-
-        public IPerforceCommandLineExecutor PerforceCommandLineExecutor
-        {
-            get
-            {
-                return (IPerforceCommandLineExecutor)this.GetRepository<PerforceCommandLineExecutor>();
-            }
-        }
-
         public IPerforceServerExecutor PerforceServerExecutor
         {
             get
@@ -121,44 +105,28 @@
                     var parameters = new object[] { this.Configurations.ServerUrl, this.InfoLogger };
                     instance = Activator.CreateInstance(typeof(PerforceCommands), parameters);
                 }
-                else if (typeof(T).IsAssignableFrom(typeof(CommandPromptExecutor)))
-                {
-                    var parameters = new object[] { this.Logger, this.InfoLogger };
-                    instance = Activator.CreateInstance(typeof(CommandPromptExecutor), parameters);
-                }
-                else if (typeof(T).IsAssignableFrom(typeof(PerforceCommandLineExecutor)))
-                {
-                    var parameters = new object[] { this.Logger, this.Configurations.RootPath, string.Empty };
-                    instance = Activator.CreateInstance(typeof(PerforceCommandLineExecutor), parameters);
-                }
                 else if (typeof(T).IsAssignableFrom(typeof(PerforceServerExecutor)))
                 {
-                    var parameters = new object[] { this.Logger, this.InfoLogger, this.Configurations.RootPath, this.Configurations.ServerSubPath };
+                    var parameters = new object[] { this.Logger, this.InfoLogger, this.PerforceCommands.ServerRoot, string.Empty };
                     instance = Activator.CreateInstance(typeof(PerforceServerExecutor), parameters);
-                }
-                else if (typeof(T).IsAssignableFrom(typeof(SevenZip_old)))
-                {
-                    var parameters = new object[] { this.Logger, this.Configurations.RootPath, this.Configurations.SevenZipSubPath };
-                    instance = Activator.CreateInstance(typeof(SevenZip_old), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(SevenZipSharp)))
                 {
-                    //var parameters = new object[] { this.Logger, this.Configurations.RootPath, this.Configurations.SevenZipSubPath };
                     instance = Activator.CreateInstance(typeof(SevenZipSharp));
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(LogFileArhivator)))
                 {
-                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.Configurations.RootPath, this.Configurations.LogFilesSubPath };
+                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.PerforceCommands.ServerRoot, this.Configurations.BackupSubPath };
                     instance = Activator.CreateInstance(typeof(LogFileArhivator), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(CheckpointArhivator)))
                 {
-                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.Configurations.RootPath, this.Configurations.JournalSubPath };
+                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.PerforceCommands.ServerRoot, this.Configurations.BackupSubPath };
                     instance = Activator.CreateInstance(typeof(CheckpointArhivator), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(RootArhivator)))
                 {
-                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.Configurations.RootPath };
+                    var parameters = new object[] { this.SevenZip, this.InfoLogger, this.PerforceCommands.ServerRoot, this.Configurations.RootArhiveSubPath };
                     instance = Activator.CreateInstance(typeof(RootArhivator), parameters);
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(DirectoryInformation)))
@@ -168,7 +136,7 @@
                 }
                 else if (typeof(T).IsAssignableFrom(typeof(ExcelWriter)))
                 {
-                    var parameters = new object[] { this.Configurations.BackupArhivePath, this.Configurations.CheckpointLogName, this.Configurations.CheckpointLogExtension };
+                    var parameters = new object[] { this.PerforceCommands.ServerRoot, this.Configurations.CheckpointLogPath };
                     instance = Activator.CreateInstance(typeof(ExcelWriter), parameters);
                 }
 

@@ -2,60 +2,43 @@
 {
     using PerforceBackup.Engine.Interfaces;
     using System.Configuration;
+    using System.Linq;
     using System.IO;
 
-    public class Configurations : IConfigurations, IArhiveSettings
+    public class Configurations : IConfigurations
     {
-        public string RootPath { get { return ConfigurationManager.AppSettings["RootPath"]; } }
+        public const string ConfigFileName = "Configurations.xml";
 
-        public string ServerSubPath { get { return ConfigurationManager.AppSettings["ServerSubPath"]; } }
+        private KeyValueConfigurationCollection settings;
 
-        public string DepotSubPath { get { return ConfigurationManager.AppSettings["DepotSubPath"]; } }
-
-        public string JournalSubPath { get { return ConfigurationManager.AppSettings["JournalSubPath"]; } }
-
-        public string CheckpointSubPath { get { return ConfigurationManager.AppSettings["CheckpointSubPath"]; } }
-
-        public string BackupArhiveSubPath { get { return ConfigurationManager.AppSettings["BackupArhiveSubPath"]; } }
-
-        public string SevenZipSubPath { get { return ConfigurationManager.AppSettings["SevenZipSubPath"]; } }
-
-        public string LogFilesSubPath { get { return ConfigurationManager.AppSettings["LogFilesSubPath"]; } }
-
-        public string MaxLogSize { get { return ConfigurationManager.AppSettings["MaxLogSize"]; } }
-
-        public string MaxAuditLogSize { get { return ConfigurationManager.AppSettings["MaxAuditLogSize"]; } }    
-
-        public string CheckpointLogName { get { return ConfigurationManager.AppSettings["CheckpointLogName"]; } }
-
-        public string CheckpointLogExtension { get { return ConfigurationManager.AppSettings["CheckpointLogExtension"]; } }
-
-        // directory arhive settings
-        public string ArhivePath { get { return ConfigurationManager.AppSettings["ArhivePath"]; } }
-
-        public string ArhiveName { get { return ConfigurationManager.AppSettings["ArhiveName"]; } }
-
-        public string ArhiveType { get { return ConfigurationManager.AppSettings["ArhiveType"]; } }
-
-        // API settings
-
-        public string ServerUrl { get { return ConfigurationManager.AppSettings["ServerUrl"]; } }
-
-        // combined paths
-        public string LogArhivePath
+        public Configurations()
         {
-            get
-            {
-                return Path.Combine(this.RootPath, this.BackupArhiveSubPath);
-            }
+            var fileMap = new ExeConfigurationFileMap();
+            fileMap.ExeConfigFilename = ConfigFileName;
+            Configuration config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+            this.settings = config.AppSettings.Settings;
         }
 
-        public string BackupArhivePath
-        {
-            get
-            {
-                return Path.Combine(this.RootPath, this.BackupArhiveSubPath);
-            }
-        }
+        public string ServerUrl { get { return this.settings["ServerUrl"].Value; } }
+
+        public string DepotSubPath { get { return this.settings["DepotSubPath"].Value; } }
+
+        public string BackupSubPath { get { return this.settings["BackupSubPath"].Value; } }
+
+        public string CheckpointSubPath { get { return this.settings["CheckpointSubPath"].Value; } }
+
+        public string LogArhiveSubPath { get { return this.settings["LogArhiveSubPath"].Value; } }
+
+        public string CheckpointArhiveSubPath { get { return this.settings["CheckpointArhiveSubPath"].Value; } }
+
+        public string CheckpointLogPath { get { return this.settings["CheckpointLogPath"].Value; } }
+
+        public string MaxLogSize { get { return this.settings["MaxLogSize"].Value; } }
+
+        public string MaxAuditLogSize { get { return this.settings["MaxAuditLogSize"].Value; } }
+
+        public string RootArhiveSubPath { get { return this.settings["RootArhiveSubPath"].Value; } }
+
+        public string ArhivePath { get { return this.settings["ArhivePath"].Value; } }
     }
 }

@@ -17,47 +17,22 @@
         private const string SheetName = "Checkpoint_Log";
 
         private string root;
-        private string fileName;
-        private string extension;
+        private string fullFileName;
 
-        public ExcelWriter(string root, string fileName, string extension)
+        public ExcelWriter(string root, string fileName)
         {
             this.root = root;
-            this.fileName = fileName;
-            this.extension = extension;
+            this.fullFileName = fileName;
         }
 
         public string FullFileRoot
         {
             get
             {
-                return Path.Combine(this.root, this.FullFileName);
+                return Path.GetFullPath(Path.Combine(this.root, this.fullFileName));
             }
         }
 
-        private string FullFileName
-        {
-            get
-            {
-                return string.Format("{0}.{1}", fileName, extension);
-            }
-        }
-
-        public string PdfFullFileRoot
-        {
-            get
-            {
-                return Path.Combine(this.root, this.PdfFullFileName);
-            }
-        }
-
-        private string PdfFullFileName
-        {
-            get
-            {
-                return string.Format("{0}.pdf", fileName);
-            }
-        }
         public void AddRow(CheckPointLogModel logData)
         {
             var columns = new List<KeyValuePair<string, object>>();
@@ -111,30 +86,30 @@
             workbook.Dispose();
         }
 
-        public void ConvertToPdf()
-        {
-            // load Excel file
-            var workbook = new Workbook();
-            workbook.LoadFromFile(this.FullFileRoot);
+        //public void ConvertToPdf()
+        //{
+        //    // load Excel file
+        //    var workbook = new Workbook();
+        //    workbook.LoadFromFile(this.FullFileRoot);
 
-            // Save PDF
-            if (File.Exists(this.PdfFullFileRoot))
-            {
-                File.Delete(this.PdfFullFileRoot);
-            }
+        //    // Save PDF
+        //    if (File.Exists(this.PdfFullFileRoot))
+        //    {
+        //        File.Delete(this.PdfFullFileRoot);
+        //    }
 
-            workbook.SaveToFile(this.PdfFullFileRoot, FileFormat.PDF);
-        }
+        //    workbook.SaveToFile(this.PdfFullFileRoot, FileFormat.PDF);
+        //}
 
         public void OpenExcel()
         {
             Process.Start(this.FullFileRoot);
         }
 
-        public void OpenPdf()
-        {
-            Process.Start(this.PdfFullFileRoot);
-        }
+        //public void OpenPdf()
+        //{
+        //    Process.Start(this.PdfFullFileRoot);
+        //}
 
         private CellPosition FindHeader(CellRange range, string startValue)
         {

@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -79,22 +80,21 @@
     <Compile Include="ApiCommands\PerforceConnection.cs" />
     <Compile Include="Interfaces\IEngineManager.cs" />
     <Compile Include="Interfaces\IExcelWriter.cs" />
-    <Compile Include="Interfaces\IArhiveSettings.cs" />
     <Compile Include="Interfaces\IInfoLogger.cs" />
     <Compile Include="Interfaces\IRootArhivator.cs" />
     <Compile Include="Interfaces\ICheckpointArhivator.cs" />
     <Compile Include="Interfaces\ILogFileArhivator.cs" />
-    <Compile Include="Base\BaseArhivator.cs" />
+    <Compile Include="Arhivators\BaseArhivator.cs" />
     <Compile Include="Configurations.cs" />
     <Compile Include="EngineManager.cs" />
     <Compile Include="Interfaces\IConfigurations.cs" />
     <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Arhivators\CheckpointArhivator.cs" />
-    <Compile Include="Base\CommandExecutor.cs" />
-    <Compile Include="Jobs\BackupJob.cs" />
+    <Compile Include="Services\CommandExecutor.cs" />
+    <Compile Include="BackupJob.cs" />
     <Compile Include="Interfaces\IJob.cs" />
     <Compile Include="Logger\ConsoleLogger.cs" />
-    <Compile Include="Services\CommandPromptExecutor.cs" />
+    <Compile Include="Logger\EmptyInfoLogger.cs" />
     <Compile Include="Common\AlphanumComparator.cs" />
     <Compile Include="Services\DirectoryInformation.cs" />
     <Compile Include="Excel\CellPosition.cs" />
@@ -102,8 +102,6 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Interfaces\IArhivator.cs" />
-    <Compile Include="Interfaces\ICommandPromptExecutor.cs" />
-    <Compile Include="Interfaces\IPerforceCommandLineExecutor.cs" />
     <Compile Include="Interfaces\IPerforceServerExecutor.cs" />
     <Compile Include="Arhivators\LogFileArhivator.cs" />
     <Compile Include="Logger\Logger.cs" />
@@ -113,14 +111,12 @@
     <Compile Include="Models\ServerVersionModel.cs" />
     <Compile Include="Models\SizesModel.cs" />
     <Compile Include="Interfaces\IDirectoryInformation.cs" />
-    <Compile Include="Services\PerforceCommandLineExecutor.cs" />
     <Compile Include="Models\CountersModel.cs" />
     <Compile Include="Services\PerforceServerExecutor.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Arhivators\RootArhivator.cs" />
-    <Compile Include="Arhivators\SevenZip_old.cs" />
     <Compile Include="Common\StringConstrants.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +126,9 @@
     <Content Include="7z.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Configurations.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="p4api.net.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -137,6 +136,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

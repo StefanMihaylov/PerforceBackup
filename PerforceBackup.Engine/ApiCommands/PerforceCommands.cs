@@ -19,6 +19,15 @@
 
         protected IInfoLogger InfoLogger { get; private set; }
 
+        public string ServerRoot
+        {
+            get
+            {
+                var serverRoot = this.Repository.Server.Metadata.Root;
+                return serverRoot;
+            }
+        }
+
         public CountersModel GetCounters()
         {
             Options options = new Options();
@@ -138,12 +147,6 @@
 
             this.InfoLogger.WriteLine(" - Server: {0}", result);
             return result;
-        }
-
-        public string GetServerRoot()
-        {
-            var serverRoot = this.Repository.Server.Metadata.Root;
-            return serverRoot;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace PerforceBackup.Engine.Jobs
+﻿namespace PerforceBackup.Engine
 {
     using System;
     using System.IO;
@@ -13,17 +13,18 @@
 
     public class BackupJob : IJob
     {
-        public const string LogArhiveName = "Backup_logs";
-        public const string CheckpointArhiveName = "Backup_ckp";
+        private string version;
 
-        public BackupJob(IEngineManager engineManager)
+        public BackupJob(IEngineManager engineManager, string version = null)
         {
             this.EngineManager = engineManager;
+            this.version = version;
         }
 
-        public BackupJob(ILog logger, IInfoLogger infoLogger, IConfigurations configurations)
+        public BackupJob(ILog logger, IInfoLogger infoLogger, IConfigurations configurations, string version = null)
             : this(new EngineManager(logger, infoLogger, configurations))
         {
+            this.version = version;
         }
 
         protected IEngineManager EngineManager { get; private set; }
@@ -55,37 +56,26 @@
         public void Execute()
         {
             CheckPointLogModel result = new CheckPointLogModel();
-
             this.Initialize(result);
-
             this.Validate();
-
             this.StopService();
-
             this.MakeCheckpoint(result);
-
             this.BackupLogs(result);
-
             this.MakeArhive(result);
-
             this.StartService();
-
             this.GetStatistics(result);
-
             this.WriteToExcel(result);
-
             this.EndMessage();
-
             this.EngineManager.ExcelWriter.OpenExcel();
         }
 
-        private void MakeArhive(CheckPointLogModel result)
+        public void MakeArhive(CheckPointLogModel result)
         {
             IRootArhivator rootArhivator = this.EngineManager.RootArhivator;
-            result.Arhive = rootArhivator.Compress(result.CheckpointName, (IArhiveSettings)this.Configurations);
+            result.Arhive = rootArhivator.Compress(result.CheckpointName, this.Configurations.ArhivePath);
         }
 
-        protected void WriteToExcel(CheckPointLogModel result)
+        public void WriteToExcel(CheckPointLogModel result)
         {
             IExcelWriter excelWriter = this.EngineManager.ExcelWriter;
             excelWriter.AddRow(result);
@@ -95,45 +85,51 @@
             this.Logger.Info("Data saved to Excel");
         }
 
-        protected void MakeCheckpoint(CheckPointLogModel result)
+        public void MakeCheckpoint(CheckPointLogModel result)
         {
             IPerforceServerExecutor server = this.EngineManager.PerforceServerExecutor;
             server.MakeCheckPoint(this.Configurations.CheckpointSubPath);
 
             // Remove old Checkpoints
             ICheckpointArhivator checkpointBackup = this.EngineManager.CheckpointArhivator;
-            result.CheckpointName = checkpointBackup.Compress(this.Configurations.LogArhivePath, CheckpointArhiveName);
+            result.CheckpointName = checkpointBackup.Compress(this.Configurations.CheckpointArhiveSubPath);
         }
 
-        protected void BackupLogs(CheckPointLogModel result)
+        public void BackupLogs(CheckPointLogModel result)
         {
             ILogFileArhivator logArhivator = this.EngineManager.LogFileArhivator;
-            result.Log = logArhivator.Compress("log", this.Configurations.MaxLogSize, this.Configurations.LogArhivePath, LogArhiveName);
-            result.AuditLog = logArhivator.Compress("auditlog", this.Configurations.MaxAuditLogSize, this.Configurations.LogArhivePath, LogArhiveName);
+            result.Log = logArhivator.Compress("log", this.Configurations.MaxLogSize, this.Configurations.LogArhiveSubPath);
+            result.AuditLog = logArhivator.Compress("auditlog", this.Configurations.MaxAuditLogSize, this.Configurations.LogArhiveSubPath);
         }
 
-        protected void Initialize(CheckPointLogModel result)
+        public void Initialize(CheckPointLogModel result)
         {
             this.InfoLogger.WriteLine(" - Start...");
-            this.Logger.Info("PerforceBackup started...");
+            string version = string.Empty;
+            if (string.IsNullOrWhiteSpace(this.version))
+            {
+                version = string.Format("v.{0}", this.version);
+            }
+
+            this.Logger.InfoFormat("PerforceBackup {0} started...", version);
             this.InfoLogger.WriteLine(" - Date: {0}", result.StartDate.ToString(StringConstrants.DateTimeFormat));
 
             this.StartService();
         }
 
-        protected void EndMessage()
+        public void EndMessage()
         {
             this.Logger.Info("End" + Environment.NewLine);
             this.InfoLogger.WriteLine(" - End");
         }
 
-        protected void Validate()
+        public void Validate()
         {
             IPerforceCommands perforce = this.EngineManager.PerforceCommands;
             perforce.Verify();
         }
 
-        protected void GetStatistics(CheckPointLogModel result)
+        public void GetStatistics(CheckPointLogModel result)
         {
             IPerforceCommands perforce = this.EngineManager.PerforceCommands;
 
@@ -144,19 +140,19 @@
             result.ProjectCount = perforce.GetProjectCount();
 
             IDirectoryInformation dirInfo = this.EngineManager.DirectoryInformation;
-            result.DepotSize = dirInfo.DirSizeInMb(perforce.GetServerRoot(), this.Configurations.DepotSubPath, this.InfoLogger);
+            result.DepotSize = dirInfo.DirSizeInMb(perforce.ServerRoot, this.Configurations.DepotSubPath, this.InfoLogger);
         }
 
-        protected void StopService()
+        public void StopService()
         {
-            ICommandPromptExecutor cmd = this.EngineManager.CommandPromptExecutor;
-            cmd.StopService();
+            IPerforceServerExecutor server = this.EngineManager.PerforceServerExecutor;
+            server.StopService();
         }
 
-        protected void StartService()
+        public void StartService()
         {
-            ICommandPromptExecutor cmd = this.EngineManager.CommandPromptExecutor;
-            cmd.StartService();
+            IPerforceServerExecutor server = this.EngineManager.PerforceServerExecutor;
+            server.StartService();
         }
     }
 }

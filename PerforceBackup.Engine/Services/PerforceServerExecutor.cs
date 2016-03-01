@@ -1,12 +1,12 @@
 ﻿namespace PerforceBackup.Engine.Services
 {
     using log4net;
-    using PerforceBackup.Engine.Base;
     using PerforceBackup.Engine.Common;
     using PerforceBackup.Engine.Models;
     using PerforceBackup.Engine.Interfaces;
     using System;
     using System.Linq;
+    using System.ServiceProcess;
 
     public class PerforceServerExecutor : CommandExecutor, IPerforceServerExecutor
     {
@@ -68,6 +68,36 @@
              };
 
             return result;
+        }
+
+        public bool StartService(string serviceName = "Perforce")
+        {
+            this.InfoLogger.Write(" - Start Server: ");
+
+            var serviceController = new ServiceController(serviceName);
+            if (serviceController.Status == ServiceControllerStatus.Stopped)
+            {
+                serviceController.Start();
+                serviceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(10.0));
+            }
+
+            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
+            return true;
+        }
+
+        public bool StopService(string serviceName = "Perforce")
+        {
+            this.InfoLogger.Write(" - Stop Server: ");
+
+            var serviceController = new ServiceController(serviceName);
+            if (serviceController.Status == ServiceControllerStatus.Running)
+            {
+                serviceController.Stop();
+                serviceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(10.0));
+            }
+
+            this.InfoLogger.WriteLine(StringConstrants.SuccessMessage);
+            return true;
         }
     }
 }

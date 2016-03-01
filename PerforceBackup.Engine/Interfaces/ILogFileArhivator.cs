@@ -4,6 +4,6 @@
 
     public interface ILogFileArhivator : IService
     {
-        LogFileModel Compress(string logFileName, string maxSize, string arhivePath, string arhiveName);
+        LogFileModel Compress(string logFileName, string maxSize, string arhivePath);
     }
 }

@@ -8,10 +8,6 @@
 
         void AddRow(CheckPointLogModel logData);
 
-        void ConvertToPdf();
-
-        void OpenExcel();
-
-        void OpenPdf();        
+        void OpenExcel();       
     }
 }
